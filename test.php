@@ -1,49 +1,49 @@
 <?php
-    session_start();
+// Let's get started with sql
+echo "Verifying that this shit works";
+$servername = "localhost";
+$username = "juan-ap";
+$password = "apache";
+$database = 'simple_php';
 
-    /* Function */
-    function doSomething($name, $address) {
-        $name = "Jane Doe";
-        echo "Hello " . $name . "\n";
-    }
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $database);
+echo "we are checking";
+// Check connection
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
+}
+echo "connection success!";
+$user = "test3";
+$pass = "test3";
+$sql = "SELECT * from Users WHERE username=\"" . $user . "\"";
+echo "not ran the first query";
+$result = mysqli_query($conn, $sql);
+echo "<br>ran the first query";
 
-    // Class
-    class Something {
-        public $name;
-        public function printName() {
-            echo $name;
-        }
-    };
+$sql = "INSERT INTO Users (username, password) VALUES ('".$user."', '".$pass."')";
+if (mysqli_num_rows($result) == 0) {
+  mysqli_query($conn, $sql);
+  echo "New record created successfully";
+} else {
+  echo "there was an error!";
+}
 
-    // Variables
-    $name = "John Doe";
-    $name = 'John Doe';
-    echo $name;
-
-    $_SESSION["name"] = serialize($name);
-    $display = true;
-    // Using the class.
-    $nameSomething = new Something();
-    $nameSomething->name = "Jane Doe";
-    echo $nameSomething->name;
-    echo $nameSomething->printName();
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <?php
-    if($display)
-    {
-        echo "display";
-    }
-    ?>
-</body>
-</html>
 
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <h1>Welcome to the test site</h1>
+</body>
+
+</html>
