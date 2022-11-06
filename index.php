@@ -1,12 +1,19 @@
 <!-- This is the main login page -->
 <?php
     session_start();
-g
-    $myfile = "../database.json";
-    $json = file_get_contents($myfile)  or die("Unable to open file!");
+    //starting the sql server
+    $servername = "localhost";
+$username = "juan-ap";
+$password = "apache";
+$database = 'simple_php';
 
-    //set to php associative array
-    $database = json_decode($json, true);
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $database);
+
+// Check connection
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
+}
     
     //define the defaults
     $errorDisplay = false;
@@ -14,17 +21,17 @@ g
 
     // handles which form to use
     if(array_key_exists('login', $_POST)) {
-        login($myfile, $database);
+        login($conn);
     }
     else if(array_key_exists('register', $_POST)) {
         
-        register($myfile, $database);
+        register($conn);
     }
     function redirect($url) {
         header('Location: ' . $url);
     }
     //pass the file
-    function register($file, $data) {
+    function register($conn) {
         global $errorDisplay, $ErrorTxt;
         $errorDisplay = true;
         $user = $password = "";
@@ -32,21 +39,22 @@ g
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $user = $_POST["newUser"];
             $password = $_POST["newPassword"];
-
-            if(array_key_exists($user, $data)) {
+            $sql = "SELECT * from Users WHERE username=\"" . $user . "\"";
+            $result = mysqli_query($conn, $sql);
+            if(mysqli_num_rows($result) > 0) {
                 $ErrorTxt = "You cannot use that username!";
             }
             else {
                 $data[$user] = $password;
-                $entry = json_encode($data);
-                file_put_contents($file, $entry);
+                $sql = "INSERT INTO Users (username, password) VALUES ('".$user."', '".$password."')";
+                mysqli_query($conn, $sql);
                 $ErrorTxt = "your account has been made successfully!";
                 $errorDisplay = false;
             }
         }
     }
 
-    function login($file, $data) {
+    function login($conn) {
         $user = $password = "";
         global $errorDisplay, $ErrorTxt;
         //only works when the server sends the form to itself
@@ -56,15 +64,15 @@ g
         
     
             // check that the login exists
-            if(array_key_exists($user, $data)) {
-            
-
-                //check the password
-                if($password == $data[$user]) {
+            //check the password
+            $sql = "SELECT * from Users WHERE username=\"" . $user . "\" AND password='".$password."'";
+            $result = mysqli_query($conn, $sql);
+            if(mysqli_num_rows($result) > 0) {
+                //if($password == $data[$user]) {
                     
                     $_SESSION["user"] = $user;
-                    redirect("logged.php", $file);
-                }
+                    redirect("logged.php");
+                //}
                 
             }
             $ErrorTxt = "Your supplied information is incorrect!";
